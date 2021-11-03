@@ -1,17 +1,17 @@
 import { combineReducers } from "redux"
-import { dataReducer, DataState } from "./data.reducer"
+// import { dataReducer, DataState } from "./data.reducer"
 import { connectRouter } from "connected-react-router"
-import { viewReducer, ViewState } from "./view.reducer"
+// import { viewReducer, ViewState } from "./view.reducer"
 
 export type ReduxState = {
-  data: DataState
+  // data: DataState
   router: any
-  view: ViewState
+  // view: ViewState
 }
 
 export const createRootReducer = (history: any) =>
   combineReducers({
-    data: dataReducer,
+    // data: dataReducer,
     router: connectRouter(history),
-    view: viewReducer,
+    // view: viewReducer,
   })

@@ -7,7 +7,6 @@ const Wrapper = styled.div`
   flex: 1;
   height: 100%;
   flex-direction: column;
-  background: black;
 `
 
 export const Scaffold = (props: { children?: ReactNode }) => {

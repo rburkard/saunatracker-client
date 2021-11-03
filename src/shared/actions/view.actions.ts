@@ -3,22 +3,21 @@ import {
   createViewAction,
 } from "frr-redux/lib/view.helpers"
 
-export enum ViewActionType {
-  Initialize = "view/Initialize",
-  SetTeam = "view/SET_TEAM",
-}
+export enum ViewActionType {}
+// Initialize = "view/Initialize",
+// SetTeam = "view/SET_TEAM",
 
-export type SetTeam = {
-  type: ViewActionType.SetTeam
-  payload: string
-}
+// export type SetTeam = {
+//   type: ViewActionType.SetTeam
+//   payload: string
+// }
 
-export const setTeam = createViewAction<SetTeam>(ViewActionType.SetTeam)
+// export const setTeam = createViewAction<SetTeam>(ViewActionType.SetTeam)
 
-export type Initialize = {
-  type: ViewActionType.Initialize
-}
+// export type Initialize = {
+//   type: ViewActionType.Initialize
+// }
 
-export const initialize = createEmptyViewAction<Initialize>(
-  ViewActionType.Initialize
-)
+// export const initialize = createEmptyViewAction<Initialize>(
+//   ViewActionType.Initialize
+// )
