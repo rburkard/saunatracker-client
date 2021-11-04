@@ -1,7 +1,9 @@
 import { createSelector } from "reselect"
 import { ReduxState } from "shared/reducers/root.reducer"
 
-// export const getGamesSelector = (state: ReduxState) => state.data.games
+
+
+export const getRecordsSelector = (state: ReduxState) => state.data.records
 // export const getTeamsSelector = (state: ReduxState) => state.data.teams
 // export const getResultsSelector = (state: ReduxState) => state.data.results
 // export const getPartyThemesSelector = (state: ReduxState) =>

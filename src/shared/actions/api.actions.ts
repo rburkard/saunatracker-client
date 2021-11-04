@@ -7,6 +7,24 @@ const { createEndpoint } = configureTypeReduxApiCreator<
   typeof mapEndpointToMethod
 >(mapEndpointToMethod)
 
+export const getRecords =  createEndpoint()(
+  {
+    request: "GET_RECORDS_REQUEST",
+    success: "GET_RECORDS_SUCCESS",
+    failure: "GET_RECORDS_FAILURE",
+  } as const,
+  Endpoints.GetRecords
+)
+
+export const getPrevRecords =  createEndpoint()(
+  {
+    request: "GET_PREV_ECORDS_REQUEST",
+    success: "GET_PREV_RECORDS_SUCCESS",
+    failure: "GET_PREV_RECORDS_FAILURE",
+  } as const,
+  Endpoints.GetPrevRecords
+)
+
 // export const getTeams = createEndpoint()(
 //   {
 //     request: "GET_TEAMS_REQUEST",
