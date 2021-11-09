@@ -19,7 +19,6 @@ export const GlobalStyle = createGlobalStyle`
   body {
     margin: 0;
     padding: 80px 0 0 0;
-    background-color: lightskyblue;
     height: 100vh;
     display: flex;
   }

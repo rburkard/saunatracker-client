@@ -31,17 +31,18 @@ export const ContentWrapper = styled.div`
 //   margin-bottom: 32px;
 // `
 
-// export const Button = styled.button`
-//   background-color: #ef220d;
-//   display: flex;
-//   flex: 1;
-//   width: 100%;
-//   justify-content: center;
-//   color: white;
-//   padding: 8px;
-//   border-radius: 3px;
-//   cursor: pointer;
-//   &:disabled {
-//     opacity: 0.3;
-//   }
-// `
+export const Button = styled.button`
+  background-color: lightblue;
+  display: flex;
+  flex: 0 0 80px;
+  height: 40px;
+  justify-content: center;
+  align-items: center;
+  color: black;
+  padding: 8px;
+  border-radius: 3px;
+  cursor: pointer;
+  &:disabled {
+    opacity: 0.3;
+  }
+`
