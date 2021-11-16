@@ -1,95 +1,298 @@
-import React from "react"
-import "react-dropdown/style.css"
-import "react-notifications-component/dist/theme.css"
-import { useDispatch, useSelector } from "react-redux"
+import React from 'react'
+import 'react-dropdown/style.css'
+import 'react-notifications-component/dist/theme.css'
+import { useDispatch, useSelector } from 'react-redux'
 import '../../node_modules/react-vis/dist/style.css'
 import * as Chart from 'react-vis'
+import {
+  format,
+  formatDistance,
+  formatRelative,
+  subDays,
+  subMinutes,
+} from 'date-fns'
 
-import { ContentWrapper, Button } from "../components/styledcomponents"
-import { getPrevRecordsDaySelector, getRecordsDaySelector, getRecordsSelector } from "shared/selectors/selectors"
-import { getPrevRecords, getRecords } from "shared/actions/api.actions"
-
-
-type Records = Record<number, Array<Record<number, number>>>
+import {
+  BlobCircle,
+  Button,
+  ButtonWrapper,
+  ChartWrapper,
+  HomeWrapper,
+  Stats,
+  StatsEntry,
+  WrapperDynamic,
+} from '../components/styledcomponents'
+import { getDataSelector } from 'shared/selectors/selectors'
+import { getRecords } from 'shared/actions/api.actions'
+import { useIsMobile } from 'components/Scaffold'
+import useWindowDimensions from 'components/responsive'
 
 export default function Home() {
   const dispatch = useDispatch()
+  const isMobile = useIsMobile()
 
-  const [selectedDay, setSelectedDay] = React.useState<number>(new Date().getDay())
-
-  const startDate:number = 1635931800601
-  const endDate:number = 21635943200822
-
-  const now = new Date()
-
-  const todayMidnight = new Date().setHours(0,0,0)
-  
-  const changeDay = (date: Date, days: number) => {
-    date.setDate(date.getDate()+days)
-    date.setHours(0,0,0)
-  }
-
-  const nextWeek = new Date()
-  changeDay(nextWeek, 7)
-
-  const prevWeek = new Date()
-  changeDay(prevWeek, -7)
-
-  const numWeekDay = now.getDay()
+  const { width, height } = useWindowDimensions()
 
   const weekDays = [
-    {value: 0, label: "Sunntig"},
-    {value: 1, label: "Mäntig"},
-    {value: 2, label: "Zistig"},
-    {value: 3, label: "Mittwuch"},
-    {value: 4, label: "Dunstig"},
-    {value: 5, label: "Fritig"},
-    {value: 6, label: "Samstig"},
+    { value: 0, label: 'Sunntig' },
+    { value: 1, label: 'Mäntig' },
+    { value: 2, label: 'Zistig' },
+    { value: 3, label: 'Mittwuch' },
+    { value: 4, label: 'Dunstig' },
+    { value: 5, label: 'Fritig' },
+    { value: 6, label: 'Samstig' },
   ]
 
+  const sortedWeekDays = weekDays
+    .slice(new Date().getDay())
+    .concat(weekDays.slice(0, new Date().getDay()))
 
+  const weekDaysMobile = [
+    { value: 0, label: 'So' },
+    { value: 1, label: 'Mo' },
+    { value: 2, label: 'Di' },
+    { value: 3, label: 'Mi' },
+    { value: 4, label: 'Do' },
+    { value: 5, label: 'Fr' },
+    { value: 6, label: 'Sa' },
+  ]
 
-  const records = useSelector(getRecordsDaySelector)
-  const prevRecords = useSelector(getPrevRecordsDaySelector)
+  const sortedWeekDaysMobile = weekDaysMobile
+    .slice(new Date().getDay())
+    .concat(weekDaysMobile.slice(0, new Date().getDay()))
 
+  // Define states and redux
+  const [selectedDay, setSelectedDay] = React.useState<number>(
+    new Date().getDay(),
+  )
+  const [currentWaterTemperature, setCurrentWaterTemperature] =
+    React.useState<number>()
+
+  const allData = useSelector(getDataSelector)
+
+  const now = new Date().getTime()
 
   React.useEffect(() => {
-    dispatch(getRecords.call({query: {startDate: Number(todayMidnight), endDate: Number(now)}}))
-    dispatch(getPrevRecords.call({query: {startDate: Number(prevWeek), endDate: Number(todayMidnight)}}))
+    dispatch(
+      getRecords.call({
+        query: { startDate: now - 1000 * 60 * 60 * 24 * 7, endDate: now },
+      }),
+    )
   }, [])
 
+  const fetchWeather = async () => {
+    try {
+      const date = format(subMinutes(new Date(), 50), 'yyyy-MM-dd')
+      const x = await fetch(
+        `https://tecdottir.herokuapp.com/measurements/tiefenbrunnen?startDate=${date}&endDate=${date}`,
+        {
+          method: 'GET',
+        },
+      )
+      const json = await x.json()
 
+      const searchStr = new Date().toISOString().slice(0, 15)
 
-  if (records === undefined) {
-    return <div>
-      Loading
-    </div>
+      const currentTime = json.result.find((obj: any) =>
+        obj.timestamp.startsWith(searchStr),
+      )
+
+      const waterTemperature: number =
+        currentTime.values.water_temperature.value
+
+      setCurrentWaterTemperature(waterTemperature)
+    } catch (error) {
+      console.log(error)
+    }
   }
 
-  // const totalData = 
-  const dayData = records[selectedDay]
-  const prevDayData = prevRecords[selectedDay]
+  fetchWeather()
 
+  const todaysData = allData[selectedDay]
 
-  console.log(dayData)
-  console.log(prevDayData)
+  // console.log(todaysData)
+  const arraySpots = allData[selectedDay].recs
+  const objectSpots = arraySpots[arraySpots.length - 1]
+  console.log('allData, ', allData)
+  console.log('objectSpots, ', objectSpots)
 
+  const timestampToMinute = (timestamp: number) =>
+    new Date(timestamp).getHours() * 3600 +
+    new Date(timestamp).getMinutes() * 60
 
+  const formatSeconds = (seconds: number) => {
+    const hours = Math.floor(seconds / 3600)
+    return `${hours} Uhr`
+  }
 
-  return <div style = {{padding: 80, display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-    {console.log(records)}
-    {console.log(prevRecords)}
-    <div style = {{display: 'flex'}}>
-      {weekDays.map(day => selectedDay === day.value ? (<Button onClick =  {() => setSelectedDay(day.value)} style = {{margin: 16, backgroundColor: 'white'}}>{day.label} </Button>) : (<Button onClick =  {() => setSelectedDay(day.value)} style = {{margin: 16}}>{day.label} </Button>)
-      )}
-    </div>
-    <Chart.XYPlot height={300} width={1200} style = {{display: 'flex', margin: 48}}>
-      <Chart.VerticalGridLines />
-      <Chart.HorizontalGridLines />
-      <Chart.XAxis style={{fontSize: 24}} tickFormat={(v) => `${new Date(v).getHours()}`} />
-      <Chart.YAxis style={{fontSize: 24}}/>
-      <Chart.VerticalBarSeries barWidth={0.5} data={dayData.recs.map(d => ({x: d.timestamp, y: d.count}))} xType={'time-utc'}/>
-      <Chart.VerticalBarSeries barWidth={0.4} data={prevDayData.recs.map(d => ({x: d.timestamp, y: d.count}))} xType={'time-utc'}/>
-    </Chart.XYPlot>
-  </div>
+  if (allData === undefined || objectSpots === undefined) {
+    return <div>Loading</div>
+  }
+
+  return isMobile ? (
+    <HomeWrapper>
+      <Stats>
+        <StatsEntry>
+          <h2>Temperatur Zürisee</h2>
+          {currentWaterTemperature === undefined ? (
+            <h2 style={{ opacity: 0.4 }}>...</h2>
+          ) : (
+            <h2>{currentWaterTemperature}</h2>
+          )}
+        </StatsEntry>
+        <StatsEntry>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <h2>Freii Plätz</h2>
+            <BlobCircle />
+          </div>
+          {new Date().getHours() < 10 ? (
+            <h2 style={{ opacity: 0.4 }}>Öffned am 10ni</h2>
+          ) : (
+            <h2>{objectSpots.count}</h2>
+          )}
+        </StatsEntry>
+      </Stats>
+      <WrapperDynamic>
+        <ButtonWrapper>
+          {sortedWeekDaysMobile.map((day) =>
+            selectedDay === day.value ? (
+              <Button
+                onClick={() => setSelectedDay(day.value)}
+                style={{ backgroundColor: 'white' }}
+              >
+                {day.label} <BlobCircle />
+              </Button>
+            ) : (
+              <Button onClick={() => setSelectedDay(day.value)}>
+                {day.label}{' '}
+              </Button>
+            ),
+          )}
+        </ButtonWrapper>
+        <ChartWrapper style={{ width: width - 30 }}>
+          <Chart.XYPlot height={300} width={600} style={{ display: 'flex' }}>
+            <Chart.VerticalGridLines />
+            <Chart.HorizontalGridLines />
+            <Chart.XAxis
+              tickTotal={13}
+              style={{ fontSize: 18 }}
+              tickFormat={(v) => formatSeconds(v)}
+            />
+            <Chart.YAxis style={{ fontSize: 18 }} />
+            <Chart.VerticalBarSeries
+              colorType="literal"
+              barWidth={0.4}
+              data={todaysData.recs.map((d) => ({
+                x: timestampToMinute(d.timestamp),
+                y: d.count,
+                color:
+                  new Date().getDay() === selectedDay &&
+                  timestampToMinute(d.timestamp) <
+                    timestampToMinute(new Date().getTime())
+                    ? 'darkblue'
+                    : 'lightblue',
+              }))}
+              xType={'time-utc'}
+            />
+          </Chart.XYPlot>
+        </ChartWrapper>
+      </WrapperDynamic>
+    </HomeWrapper>
+  ) : (
+    <HomeWrapper>
+      <Stats>
+        <StatsEntry>
+          <h2>Temperatur Zürisee</h2>
+          {currentWaterTemperature === undefined ? (
+            <h2 style={{ opacity: 0.4 }}>...</h2>
+          ) : (
+            <h2>{currentWaterTemperature}</h2>
+          )}
+        </StatsEntry>
+        <StatsEntry>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <h2>Freii Plätz</h2>
+            <BlobCircle />
+          </div>
+          {new Date().getHours() < 10 ? (
+            <h2 style={{ opacity: 0.4 }}>Öffned am 10ni</h2>
+          ) : (
+            <h2>{objectSpots.count}</h2>
+          )}
+        </StatsEntry>
+      </Stats>
+      <WrapperDynamic>
+        <ButtonWrapper>
+          {sortedWeekDays.map((day) => {
+            if (
+              selectedDay === day.value &&
+              selectedDay === new Date().getDay()
+            ) {
+              return (
+                <Button
+                  onClick={() => setSelectedDay(day.value)}
+                  style={{ backgroundColor: 'white' }}
+                >
+                  {day.label}
+                  <BlobCircle />
+                </Button>
+              )
+            } else if (selectedDay === day.value) {
+              return (
+                <Button
+                  onClick={() => setSelectedDay(day.value)}
+                  style={{ backgroundColor: 'white' }}
+                >
+                  {day.label}
+                </Button>
+              )
+            } else {
+              return (
+                <Button onClick={() => setSelectedDay(day.value)}>
+                  {day.label}
+                </Button>
+              )
+            }
+          })}
+        </ButtonWrapper>
+        <Chart.XYPlot height={500} width={1200} style={{ display: 'flex' }}>
+          <Chart.VerticalGridLines />
+          <Chart.HorizontalGridLines />
+          <Chart.XAxis
+            tickTotal={13}
+            style={{ fontSize: 20 }}
+            tickFormat={(v) => formatSeconds(v)}
+          />
+          <Chart.YAxis style={{ fontSize: 20 }} />
+          <Chart.VerticalBarSeries
+            colorType="literal"
+            barWidth={0.4}
+            data={todaysData.recs.map((d) => ({
+              x: timestampToMinute(d.timestamp),
+              y: d.count,
+              color:
+                new Date().getDay() === selectedDay &&
+                timestampToMinute(d.timestamp) <
+                  timestampToMinute(new Date().getTime())
+                  ? 'darkblue'
+                  : 'lightblue',
+            }))}
+            xType={'time-utc'}
+          />
+        </Chart.XYPlot>
+      </WrapperDynamic>
+    </HomeWrapper>
+  )
 }

@@ -26,7 +26,7 @@
     "@types/uuid": "^3.4.4",
     "color-hash": "^1.0.3",
     "connected-react-router": "^6.8.0",
-    "date-fns": "2.6.0",
+    "date-fns": "^2.25.0",
     "fp-ts": "1.19.5",
     "frr-global": "^1.0.27",
     "frr-redux": "^1.0.24",

@@ -47,7 +47,7 @@ export const App = () => {
     return (
       <Scaffold>
         <ContentWrapper>
-          <p>Test</p>
+          <Home />
         </ContentWrapper>
       </Scaffold>
     )
