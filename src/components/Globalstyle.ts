@@ -16,6 +16,10 @@ export const GlobalStyle = createGlobalStyle`
     flex: 1;
   }
 
+  svg {
+    overflow: visible;
+  }
+
   body {
     margin: 0;
     padding: 80px 0 0 0;

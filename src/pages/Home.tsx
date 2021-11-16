@@ -18,6 +18,8 @@ import {
   ButtonWrapper,
   ChartWrapper,
   HomeWrapper,
+  LegendCircle,
+  LegendWrapper,
   Stats,
   StatsEntry,
   WrapperDynamic,
@@ -120,9 +122,19 @@ export default function Home() {
     new Date(timestamp).getHours() * 3600 +
     new Date(timestamp).getMinutes() * 60
 
+  // const formatSeconds = (seconds: number) => {
+  //   const hours = Math.floor(seconds / 3600)
+  //   const minutes = Math.ceil(Math.floor((seconds % 3600) / 60) / 10) * 10
+
+  //   if (minutes === 0 || minutes === 60) {
+  //     return `${hours}:00`
+  //   }
+  //   return `${hours}:${minutes}`
+  // }
+
   const formatSeconds = (seconds: number) => {
     const hours = Math.floor(seconds / 3600)
-    return `${hours} Uhr`
+    return hours
   }
 
   if (allData === undefined || objectSpots === undefined) {
@@ -133,11 +145,11 @@ export default function Home() {
     <HomeWrapper>
       <Stats>
         <StatsEntry>
-          <h2>Temperatur Zürisee</h2>
+          <h2>Lake temperature</h2>
           {currentWaterTemperature === undefined ? (
-            <h2 style={{ opacity: 0.4 }}>...</h2>
+            <h2 style={{ opacity: 0.4 }}>... °C</h2>
           ) : (
-            <h2>{currentWaterTemperature}</h2>
+            <h2>{currentWaterTemperature - 1} °C</h2>
           )}
         </StatsEntry>
         <StatsEntry>
@@ -148,8 +160,8 @@ export default function Home() {
               justifyContent: 'center',
             }}
           >
-            <h2>Freii Plätz</h2>
-            <BlobCircle />
+            <h2>Free spots</h2>
+            {new Date().getHours() >= 10 ? <BlobCircle /> : <div />}
           </div>
           {new Date().getHours() < 10 ? (
             <h2 style={{ opacity: 0.4 }}>Öffned am 10ni</h2>
@@ -166,7 +178,7 @@ export default function Home() {
                 onClick={() => setSelectedDay(day.value)}
                 style={{ backgroundColor: 'white' }}
               >
-                {day.label} <BlobCircle />
+                {day.label}
               </Button>
             ) : (
               <Button onClick={() => setSelectedDay(day.value)}>
@@ -175,14 +187,22 @@ export default function Home() {
             ),
           )}
         </ButtonWrapper>
+        <LegendWrapper style={{ marginBottom: 16 }}>
+          <LegendCircle style={{ backgroundColor: 'darkblue' }} />
+          <h3>Free spots currently</h3>
+          <LegendCircle style={{ backgroundColor: 'lightblue' }} />
+          <h3>Free spots forecast</h3>
+        </LegendWrapper>
         <ChartWrapper style={{ width: width - 30 }}>
           <Chart.XYPlot height={300} width={600} style={{ display: 'flex' }}>
             <Chart.VerticalGridLines />
             <Chart.HorizontalGridLines />
             <Chart.XAxis
-              tickTotal={13}
-              style={{ fontSize: 18 }}
-              tickFormat={(v) => formatSeconds(v)}
+              style={{ fontSize: 14 }}
+              tickFormat={(v) => `${formatSeconds(v)}:00`}
+              tickValues={[
+                10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,
+              ].map((v) => v * 3600)}
             />
             <Chart.YAxis style={{ fontSize: 18 }} />
             <Chart.VerticalBarSeries
@@ -208,11 +228,11 @@ export default function Home() {
     <HomeWrapper>
       <Stats>
         <StatsEntry>
-          <h2>Temperatur Zürisee</h2>
+          <h2>Lake temperature</h2>
           {currentWaterTemperature === undefined ? (
-            <h2 style={{ opacity: 0.4 }}>...</h2>
+            <h2 style={{ opacity: 0.4 }}>... °C</h2>
           ) : (
-            <h2>{currentWaterTemperature}</h2>
+            <h2>{currentWaterTemperature - 1} °C</h2>
           )}
         </StatsEntry>
         <StatsEntry>
@@ -223,8 +243,8 @@ export default function Home() {
               justifyContent: 'center',
             }}
           >
-            <h2>Freii Plätz</h2>
-            <BlobCircle />
+            <h2>Free spots</h2>
+            {new Date().getHours() >= 10 ? <BlobCircle /> : <div />}
           </div>
           {new Date().getHours() < 10 ? (
             <h2 style={{ opacity: 0.4 }}>Öffned am 10ni</h2>
@@ -267,13 +287,21 @@ export default function Home() {
             }
           })}
         </ButtonWrapper>
+        <LegendWrapper>
+          <LegendCircle style={{ backgroundColor: 'darkblue' }} />
+          <h2>Free spots currently</h2>
+          <LegendCircle style={{ backgroundColor: 'lightblue' }} />
+          <h2>Free spots forecast</h2>
+        </LegendWrapper>
         <Chart.XYPlot height={500} width={1200} style={{ display: 'flex' }}>
           <Chart.VerticalGridLines />
           <Chart.HorizontalGridLines />
           <Chart.XAxis
-            tickTotal={13}
             style={{ fontSize: 20 }}
-            tickFormat={(v) => formatSeconds(v)}
+            tickFormat={(v) => `${formatSeconds(v)}:00`}
+            tickValues={[
+              10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,
+            ].map((v) => v * 3600)}
           />
           <Chart.YAxis style={{ fontSize: 20 }} />
           <Chart.VerticalBarSeries

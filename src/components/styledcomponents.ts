@@ -133,6 +133,19 @@ export const ChartWrapper = styled.div`
   flex-direction: row;
 `
 
+export const LegendWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+`
+
+export const LegendCircle = styled.div`
+  border-radius: 50%;
+  margin: 16px;
+  height: 20px;
+  width: 20px;
+`
+
 export const BlobCircle = styled.div`
   background: darkblue;
   border-radius: 50%;
