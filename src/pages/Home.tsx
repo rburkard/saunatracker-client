@@ -256,20 +256,7 @@ export default function Home() {
       <WrapperDynamic>
         <ButtonWrapper>
           {sortedWeekDays.map((day) => {
-            if (
-              selectedDay === day.value &&
-              selectedDay === new Date().getDay()
-            ) {
-              return (
-                <Button
-                  onClick={() => setSelectedDay(day.value)}
-                  style={{ backgroundColor: 'white' }}
-                >
-                  {day.label}
-                  <BlobCircle />
-                </Button>
-              )
-            } else if (selectedDay === day.value) {
+            if (selectedDay === day.value) {
               return (
                 <Button
                   onClick={() => setSelectedDay(day.value)}
